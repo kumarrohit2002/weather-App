@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 
 const WeatherApp = () => {
   const [city, setCity] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
   const [weather, setWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ const WeatherApp = () => {
   const [theme, setTheme] = useState("light");
   const [history, setHistory] = useState([]);
 
-  const API_KEY =import.meta.env.VITE_API_KEY;
+  const API_KEY = import.meta.env.VITE_API_KEY;
 
   useEffect(() => {
     const storedHistory = JSON.parse(localStorage.getItem("weatherHistory")) || [];
@@ -47,6 +48,21 @@ const WeatherApp = () => {
     }
   };
 
+  const fetchSuggestions = async (input) => {
+    if (input.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=5&appid=${API_KEY}`
+      );
+      setSuggestions(response.data.map((city) => city.name));
+    } catch (err) {
+      console.error("Suggestion error", err);
+    }
+  };
+
   const updateHistory = (city) => {
     let newHistory = [city, ...history.filter((c) => c !== city)].slice(0, 5);
     setHistory(newHistory);
@@ -62,13 +78,34 @@ const WeatherApp = () => {
       <button onClick={toggleTheme} className="absolute top-4 right-4 p-2 bg-gray-200 rounded-lg shadow-md">{theme === "dark" ? "Light Mode" : "Dark Mode"}</button>
       <h1 className="text-4xl font-bold mb-6">Weather Dashboard</h1>
       <form className="flex gap-2 w-full max-w-md" onSubmit={fetchWeather}>
-        <input
-          type="text"
-          placeholder="Enter city name"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          className="w-full bg-gray-100 p-3 rounded-lg text-black shadow-md outline-none"
-        />
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="Enter city name"
+            value={city}
+            onChange={(e) => {
+              setCity(e.target.value);
+              fetchSuggestions(e.target.value);
+            }}
+            className="w-full p-3 rounded-lg text-black shadow-md outline-none"
+          />
+          {suggestions.length > 0 && (
+            <ul className="absolute w-full bg-white border border-gray-300 rounded-lg shadow-md mt-1 max-h-40 overflow-auto">
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  className="p-2 cursor-pointer hover:bg-gray-200"
+                  onClick={() => {
+                    setCity(suggestion);
+                    setSuggestions([]);
+                  }}
+                >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
         <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-500 shadow-md">Search</button>
       </form>
       {loading && <motion.p className="mt-4 text-lg" animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1 }}>Loading...</motion.p>}
@@ -96,16 +133,6 @@ const WeatherApp = () => {
               </div>
             ))}
           </div>
-        </div>
-      )}
-      {history.length > 0 && (
-        <div className="mt-6 w-full max-w-md text-center">
-          <h3 className="text-xl font-bold">Recent Searches</h3>
-          <ul className="flex gap-2 justify-center mt-2">
-            {history.map((h, index) => (
-              <li key={index} className="cursor-pointer bg-gray-300 px-4 py-2 rounded-lg" onClick={() => setCity(h)}>{h}</li>
-            ))}
-          </ul>
         </div>
       )}
     </div>
