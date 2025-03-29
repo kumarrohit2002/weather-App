@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import TemperatureDisplay from './components/TemperatureDisplay';
 
 const WeatherApp = () => {
   const [city, setCity] = useState("");
@@ -20,7 +21,9 @@ const WeatherApp = () => {
   }, []);
 
   const fetchWeather = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     if (!city) return;
     setLoading(true);
     setError(null);
@@ -73,6 +76,11 @@ const WeatherApp = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
+  const handleHistoryClick = (city) => {
+    setCity(city);
+    fetchWeather();
+  };
+
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen p-6 transition-all ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
       <button onClick={toggleTheme} className="absolute top-4 right-4 p-2 bg-gray-200 rounded-lg shadow-md">{theme === "dark" ? "Light Mode" : "Dark Mode"}</button>
@@ -111,7 +119,7 @@ const WeatherApp = () => {
       {history.length > 0 && (
         <div className="mt-4 flex gap-2">
           {history.map((item, index) => (
-            <button key={index} onClick={() => setCity(item)} className="bg-gray-300 px-3 py-2 rounded-lg shadow-md">
+            <button key={index} onClick={() => handleHistoryClick(item)} className="bg-gray-300 px-3 py-2 rounded-lg shadow-md">
               {item}
             </button>
           ))}
@@ -124,10 +132,15 @@ const WeatherApp = () => {
           <h2 className="text-3xl font-bold">{weather.name}</h2>
           <p className="text-xl capitalize">{weather.weather[0].description}</p>
           <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt={weather.weather[0].description} className="mx-auto" />
-          <p className="text-4xl font-semibold">{weather.main.temp}°C</p>
-          <p className="text-lg">Humidity: {weather.main.humidity}%</p>
-          <p className="text-lg">Wind Speed: {weather.wind.speed} km/h</p>
-          <button onClick={() => fetchWeather({ preventDefault: () => {} })} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500">Refresh</button>
+          
+          <div className="flex flex-col items-center justify-center">
+            <TemperatureDisplay temperature={weather.main.temp} />
+            <div className="flex justify-around w-full mt-4">
+              <p className="text-lg">Humidity: {weather.main.humidity}%</p>
+              <p className="text-lg">Wind Speed: {weather.wind.speed} km/h</p>
+            </div>
+          </div>
+          <button onClick={() => fetchWeather()} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500">Refresh</button>
         </motion.div>
       )}
       {forecast && (
