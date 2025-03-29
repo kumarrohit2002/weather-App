@@ -55,7 +55,7 @@ const WeatherApp = () => {
     }
     try {
       const response = await axios.get(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=5&appid=${API_KEY}`
+        `https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=3&appid=${API_KEY}`
       );
       setSuggestions(response.data.map((city) => city.name));
     } catch (err) {
@@ -87,7 +87,7 @@ const WeatherApp = () => {
               setCity(e.target.value);
               fetchSuggestions(e.target.value);
             }}
-            className="w-full p-3 rounded-lg text-black shadow-md outline-none"
+            className="w-full p-3 bg-gray-100 rounded-lg text-black shadow-md outline-none"
           />
           {suggestions.length > 0 && (
             <ul className="absolute w-full bg-white border border-gray-300 rounded-lg shadow-md mt-1 max-h-40 overflow-auto">
@@ -108,6 +108,15 @@ const WeatherApp = () => {
         </div>
         <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-500 shadow-md">Search</button>
       </form>
+      {history.length > 0 && (
+        <div className="mt-4 flex gap-2">
+          {history.map((item, index) => (
+            <button key={index} onClick={() => setCity(item)} className="bg-gray-300 px-3 py-2 rounded-lg shadow-md">
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
       {loading && <motion.p className="mt-4 text-lg" animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1 }}>Loading...</motion.p>}
       {error && <p className="mt-4 text-red-500">{error}</p>}
       {weather && (
