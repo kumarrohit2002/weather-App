@@ -67,7 +67,7 @@ const WeatherApp = () => {
           placeholder="Enter city name"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="w-full p-3 rounded-lg text-black shadow-md outline-none"
+          className="w-full bg-gray-100 p-3 rounded-lg text-black shadow-md outline-none"
         />
         <button type="submit" className="bg-blue-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-500 shadow-md">Search</button>
       </form>
