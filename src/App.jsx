@@ -66,112 +66,108 @@ const WeatherApp = () => {
   };
 
   return (
-    <div
-      className={`flex flex-col items-center justify-center min-h-screen p-6 transition-all ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-      }`}
-    >
-      {/* Theme Toggle */}
-      <label className="inline-flex items-center me-5 cursor-pointer">
-        <input
-          type="checkbox"
-          className="sr-only peer"
-          checked={theme === "dark"}
-          onChange={toggleTheme}
-        />
-        <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600 dark:peer-checked:bg-red-600"></div>
-        <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-          {theme === "dark" ? "Dark Mode" : "Light Mode"}
-        </span>
-      </label>
-
-      {/* Heading */}
-      <h1 className="text-4xl font-bold mb-6">Weather Dashboard</h1>
-
-      {/* Search Form */}
-      <form className="flex gap-2 w-full max-w-md" onSubmit={handleSearch}>
-        <div className="relative w-full">
-          <input
-            type="text"
-            placeholder="Enter city name"
-            value={city}
-            onChange={(e) => {
-              setCity(e.target.value);
-              fetchSuggestions(e.target.value);
-            }}
-            className="w-full p-3 bg-gray-100 rounded-lg text-black shadow-md outline-none"
-          />
-          {/* Suggestions Dropdown */}
-          {suggestions.length > 0 && (
-            <ul className="absolute w-full bg-white border border-gray-300 rounded-lg shadow-md mt-1 max-h-40 overflow-auto">
-              {suggestions.map((suggestion, index) => (
-                <li
-                  key={index}
-                  className="p-2 cursor-pointer hover:bg-gray-200"
-                  onClick={() => {
-                    setCity(suggestion);
-                    setSuggestions([]);
-                    fetchWeather(suggestion);
-                  }}
-                >
-                  {suggestion}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-500 shadow-md"
-        >
-          Search
-        </button>
-      </form>
-
-      {/* Search History */}
-      {history.length > 0 && (
-        <div className="mt-4 flex gap-2">
-          {history.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => handleHistoryClick(item)}
-              className="bg-gray-300 text-black px-3 py-2 rounded-lg shadow-md"
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Loading Indicator */}
-      {loading && (
-        <motion.p
-          className="mt-4 text-lg"
-          animate={{ opacity: [0, 1, 0] }}
-          transition={{ repeat: Infinity, duration: 1 }}
-        >
-          <img
-            className="w-20 h-20 animate-spin"
-            src="https://www.svgrepo.com/show/474682/loading.svg"
-            alt="Loading icon"
-          />
-        </motion.p>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div>
-          <NotFound />
-          <p className="mt-4 text-red-500">{error}</p>
-        </div>
-      )}
-
-      {/* Weather Details */}
-      {weather && <WeatherDetails weather={weather} />}
-
-      {/* Forecast Details */}
-      {forecast && <ForcastDetail weather={weather} />}
+    <div className={`flex flex-col items-center justify-center 
+      ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+    
+      <div className="flex flex-col items-center justify-center 
+        min-h-screen p-4 sm:p-6 max-w-[95%] sm:max-w-[800px] w-full transition-all">
+    
+        {/* Theme Toggle */}
+        <label className="inline-flex items-center me-5 cursor-pointer">
+          <input type="checkbox" className="sr-only peer" checked={theme === "dark"} onChange={toggleTheme} />
+          <div className="relative w-10 h-5 bg-gray-300 rounded-full 
+            peer-checked:bg-red-600 after:absolute after:top-0.5 
+            after:left-[2px] after:w-4 after:h-4 after:bg-white 
+            after:rounded-full after:transition-all peer-checked:after:translate-x-5"></div>
+          <span className="ms-2 text-sm font-medium">{theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
+        </label>
+    
+        {/* Heading */}
+        <h1 className="text-2xl sm:text-4xl font-bold text-center mb-4">Weather Dashboard</h1>
+    
+        {/* Search Form */}
+        <form className="flex w-full " onSubmit={handleSearch}>
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Enter city name"
+              value={city}
+              onChange={(e) => {
+                setCity(e.target.value);
+                fetchSuggestions(e.target.value);
+              }}
+              className="w-full p-3 bg-gray-200 rounded-lg text-black shadow-md outline-none"
+            />
+            {/* Suggestions Dropdown */}
+            {suggestions.length > 0 && (
+              <ul className="absolute w-full bg-white border border-gray-300 
+                rounded-lg shadow-md mt-1 max-h-40 overflow-auto text-sm">
+                {suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    className="p-2 cursor-pointer hover:bg-gray-200"
+                    onClick={() => {
+                      setCity(suggestion);
+                      setSuggestions([]);
+                      fetchWeather(suggestion);
+                    }}
+                  >
+                    {suggestion}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-5 py-3 rounded-lg font-bold 
+            hover:bg-blue-500 shadow-md w-full sm:w-auto">
+            Search
+          </button>
+        </form>
+    
+        {/* Search History */}
+        {history.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2 justify-center">
+            {history.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => handleHistoryClick(item)}
+                className="bg-gray-300 text-black px-3 py-2 rounded-lg shadow-md text-sm"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
+    
+        {/* Loading Indicator */}
+        {loading && (
+          <motion.p
+            className="mt-4 text-lg flex justify-center"
+            animate={{ opacity: [0, 1, 0] }}
+            transition={{ repeat: Infinity, duration: 1 }}
+          >
+            <img className="w-16 h-16 animate-spin" src="https://www.svgrepo.com/show/474682/loading.svg" alt="Loading icon" />
+          </motion.p>
+        )}
+    
+        {/* Error Message */}
+        {error && (
+          <div className="text-center">
+            <NotFound />
+            <p className="mt-4 text-red-500">{error}</p>
+          </div>
+        )}
+    
+        {/* Weather Details */}
+        {weather && <WeatherDetails weather={weather} />}
+    
+        {/* Forecast Details */}
+        {forecast && <ForcastDetail weather={weather} />}
+      </div>
     </div>
+    
   );
 };
 
