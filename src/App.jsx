@@ -108,12 +108,12 @@ const WeatherApp = () => {
         </button>
       </form>
       {history.length > 0 && (
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4  flex gap-2">
           {history.map((item, index) => (
             <button
               key={index}
               onClick={() => handleHistoryClick(item)}
-              className="bg-gray-300 px-3 py-2 rounded-lg shadow-md"
+              className="bg-gray-300 text-black px-3 py-2 rounded-lg shadow-md"
             >
               {item}
             </button>
@@ -173,7 +173,7 @@ const WeatherApp = () => {
         </motion.div>
       )}
       {forecast && (
-        <div className="mt-6 bg-gray-200 p-6 rounded-lg shadow-lg w-full max-w-md">
+        <div className="mt-6 bg-gray-200 p-6 text-black rounded-lg shadow-lg w-full max-w-md">
           <h3 className="text-2xl font-bold mb-2">5-Day Forecast</h3>
           <div className="flex justify-between">
             {forecast.map((day, index) => (

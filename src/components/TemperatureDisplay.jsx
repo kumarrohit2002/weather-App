@@ -21,10 +21,10 @@ const TemperatureDisplay = ({ temperature }) => {
     } else if (temperature < 18) {
       setColor("#4682B4");
       setTempLabel("Low");
-    } else if (temperature < 28) {
+    } else if (temperature < 30) {
       setColor("#FFD700");
       setTempLabel("Medium");
-    } else if (temperature < 38) {
+    } else if (temperature < 36) {
       setColor("#FFA500");
       setTempLabel("High");
     } else {
