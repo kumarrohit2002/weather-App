@@ -2,7 +2,7 @@ import React from 'react'
 import { motion } from "framer-motion";
 import TemperatureDisplay from './TemperatureDisplay';
 import humidity from "../assets/image.png";
-import wind from '../assets/Wind.jpg'
+import wind from '../assets/wind.jpg'
 
 const WeatherDetails = ({weather}) => {
     const cool='bg-linear-to-r/shorter from-indigo-500 to-teal-400';
