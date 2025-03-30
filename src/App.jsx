@@ -141,7 +141,7 @@ const WeatherApp = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mt-6 bg-white p-6 rounded-lg shadow-lg text-gray-900 text-center w-full max-w-md"
+          className=" bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[#9d174d] via-[#d946ef] to-[#f0abfc]  mt-6 bg-white p-6 rounded-lg shadow-lg text-gray-900 text-center w-full max-w-md"
         >
           <h2 className="text-3xl font-bold">{weather.name}</h2>
           <p className="text-xl capitalize">{weather.weather[0].description}</p>
