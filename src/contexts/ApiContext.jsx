@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
 
@@ -6,9 +5,7 @@ export const ApiContext = createContext();
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-
 export const ApiProvider = ({ children }) => {
-
   const [city, setCity] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [weather, setWeather] = useState(null);
@@ -17,9 +14,6 @@ export const ApiProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [theme, setTheme] = useState("light");
   const [history, setHistory] = useState([]);
-
-  const API_KEY = import.meta.env.VITE_API_KEY;
-
 
   useEffect(() => {
     const storedHistory = JSON.parse(localStorage.getItem("weatherHistory")) || [];
@@ -52,7 +46,20 @@ export const ApiProvider = ({ children }) => {
       const response = await axios.get(
         `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`
       );
-      setForecast(response.data.list.slice(0, 5));
+
+      // Extract only one forecast per day
+      const dailyForecast = [];
+      const dates = new Set();
+
+      response.data.list.forEach((item) => {
+        const date = item.dt_txt.split(" ")[0]; // Extract YYYY-MM-DD part
+        if (!dates.has(date)) {
+          dates.add(date);
+          dailyForecast.push(item);
+        }
+      });
+
+      setForecast(dailyForecast.slice(0, 5)); // Get only 5 unique days
     } catch (err) {
       console.error("Forecast error", err);
     }
@@ -79,9 +86,24 @@ export const ApiProvider = ({ children }) => {
     localStorage.setItem("weatherHistory", JSON.stringify(newHistory));
   };
 
-
   return (
-    <ApiContext.Provider value={{ weather, setTheme,setSuggestions,forecast,setCity,city, loading,theme, error, history, fetchWeather, suggestions, fetchSuggestions }}>
+    <ApiContext.Provider
+      value={{
+        weather,
+        setTheme,
+        setSuggestions,
+        forecast,
+        setCity,
+        city,
+        loading,
+        theme,
+        error,
+        history,
+        fetchWeather,
+        suggestions,
+        fetchSuggestions,
+      }}
+    >
       {children}
     </ApiContext.Provider>
   );

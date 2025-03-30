@@ -5,8 +5,10 @@ import { ApiContext } from "./contexts/ApiContext";
 import TemperatureDisplay from "./components/TemperatureDisplay";
 import humidity from "./assets/image.png";
 import wind from "./assets/wind.jpg";
+import ForcastChart from './components/ForcastChart'
 
 import NotFound from "./components/NotFound";
+import MapLocation from "./components/MapLocation";
 
 const WeatherApp = () => {
   const {
@@ -28,6 +30,9 @@ const WeatherApp = () => {
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
+
+  const cool='bg-linear-to-r/shorter from-indigo-500 to-teal-400';
+  const hot='bg-linear-to-r/longer from-indigo-700 to-teal-200';
 
   // Function to fetch weather based on user's location
   useEffect(() => {
@@ -60,7 +65,7 @@ const WeatherApp = () => {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-screen p-6 transition-all ${
+      className={`flex flex-col items-center justify-center min-h-screen  p-6 transition-all ${
         theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
       }`}
     >
@@ -141,7 +146,7 @@ const WeatherApp = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className=" bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[#9d174d] via-[#d946ef] to-[#f0abfc]  mt-6 bg-white p-6 rounded-lg shadow-lg text-gray-900 text-center w-full max-w-md"
+          className={` ${weather.main.temp>25?hot:cool}  mt-6 bg-white p-6 rounded-lg shadow-lg text-gray-900 text-center w-full `}
         >
           <h2 className="text-3xl font-bold">{weather.name}</h2>
           <p className="text-xl capitalize">{weather.weather[0].description}</p>
@@ -170,14 +175,18 @@ const WeatherApp = () => {
           >
             Refresh
           </button>
+          
         </motion.div>
+
       )}
       {forecast && (
-        <div className="mt-6 bg-gray-200 p-6 text-black rounded-lg shadow-lg w-full max-w-md">
+        
+        <div className="mt-6 bg-gray-200 p-6 flex flex-col item-center justify-center text-black rounded-lg shadow-lg w-full">
           <h3 className="text-2xl font-bold mb-2">5-Day Forecast</h3>
-          <div className="flex justify-between">
+          <ForcastChart/>
+          <div className="flex justify-between mb-10">
             {forecast.map((day, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className={`rounded-sm m-1 space-x-2 text-center`}>
                 <p>{new Date(day.dt_txt).toLocaleDateString()}</p>
                 <img
                   src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`}
@@ -187,8 +196,10 @@ const WeatherApp = () => {
               </div>
             ))}
           </div>
+          <MapLocation weather={weather} />
         </div>
       )}
+
     </div>
   );
 };
