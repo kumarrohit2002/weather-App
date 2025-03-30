@@ -6,7 +6,7 @@ const TemperatureDisplay = ({ temperature }) => {
   const [tempLabel, setTempLabel] = useState("");
 
   useEffect(() => {
-    const maxTemp = 40;
+    const maxTemp = 45;
     const percentage = (temperature / maxTemp) * 100;
 
     // Adjusting the dasharray for the gauge
@@ -15,16 +15,16 @@ const TemperatureDisplay = ({ temperature }) => {
 
     setDashArray(`${filledLength} ${remainingLength}`);
 
-    if (temperature < 5) {
+    if (temperature < 8) {
       setColor("#1E90FF");
       setTempLabel("Very Low");
-    } else if (temperature < 15) {
+    } else if (temperature < 18) {
       setColor("#4682B4");
       setTempLabel("Low");
-    } else if (temperature < 25) {
+    } else if (temperature < 28) {
       setColor("#FFD700");
       setTempLabel("Medium");
-    } else if (temperature < 35) {
+    } else if (temperature < 38) {
       setColor("#FFA500");
       setTempLabel("High");
     } else {
