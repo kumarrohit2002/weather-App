@@ -2,13 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { ApiContext } from "./contexts/ApiContext";
-import TemperatureDisplay from "./components/TemperatureDisplay";
-import humidity from "./assets/image.png";
-import wind from "./assets/wind.jpg";
-import ForcastChart from './components/ForcastChart'
-
 import NotFound from "./components/NotFound";
-import MapLocation from "./components/MapLocation";
+import WeatherDetails from "./components/WeatherDetails";
+import ForcastDetail from "./components/ForcastDetail";
 
 const WeatherApp = () => {
   const {
@@ -31,22 +27,22 @@ const WeatherApp = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
-  const cool='bg-linear-to-r/shorter from-indigo-500 to-teal-400';
-  const hot='bg-linear-to-r/longer from-indigo-700 to-teal-200';
+  const cool = "bg-gradient-to-r from-indigo-500 to-teal-400";
+  const hot = "bg-gradient-to-r from-indigo-700 to-teal-200";
 
-  // Function to fetch weather based on user's location
+  // Fetch weather using user's current location
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          const API_KEY =import.meta.env.VITE_API_KEY;
+          const API_KEY = import.meta.env.VITE_API_KEY;
           const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`;
 
           try {
             const response = await axios.get(url);
-            setCity(response.data.name); 
-            fetchWeather();
+            setCity(response.data.name);
+            fetchWeather(response.data.name); // Fetch weather for detected city
           } catch (err) {
             console.error("Error fetching weather:", err);
           }
@@ -58,25 +54,42 @@ const WeatherApp = () => {
     }
   }, []);
 
+  // Handle search submission
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchWeather(city);
+  };
+
   const handleHistoryClick = (city) => {
     setCity(city);
-    fetchWeather();
+    fetchWeather(city);
   };
 
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-screen  p-6 transition-all ${
+      className={`flex flex-col items-center justify-center min-h-screen p-6 transition-all ${
         theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
       }`}
     >
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 p-2 bg-gray-200 rounded-lg shadow-md"
-      >
-        {theme === "dark" ? "Light Mode" : "Dark Mode"}
-      </button>
+      {/* Theme Toggle */}
+      <label className="inline-flex items-center me-5 cursor-pointer">
+        <input
+          type="checkbox"
+          className="sr-only peer"
+          checked={theme === "dark"}
+          onChange={toggleTheme}
+        />
+        <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600 dark:peer-checked:bg-red-600"></div>
+        <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+          {theme === "dark" ? "Dark Mode" : "Light Mode"}
+        </span>
+      </label>
+
+      {/* Heading */}
       <h1 className="text-4xl font-bold mb-6">Weather Dashboard</h1>
-      <form className="flex gap-2 w-full max-w-md" onSubmit={fetchWeather}>
+
+      {/* Search Form */}
+      <form className="flex gap-2 w-full max-w-md" onSubmit={handleSearch}>
         <div className="relative w-full">
           <input
             type="text"
@@ -88,6 +101,7 @@ const WeatherApp = () => {
             }}
             className="w-full p-3 bg-gray-100 rounded-lg text-black shadow-md outline-none"
           />
+          {/* Suggestions Dropdown */}
           {suggestions.length > 0 && (
             <ul className="absolute w-full bg-white border border-gray-300 rounded-lg shadow-md mt-1 max-h-40 overflow-auto">
               {suggestions.map((suggestion, index) => (
@@ -97,6 +111,7 @@ const WeatherApp = () => {
                   onClick={() => {
                     setCity(suggestion);
                     setSuggestions([]);
+                    fetchWeather(suggestion);
                   }}
                 >
                   {suggestion}
@@ -112,8 +127,10 @@ const WeatherApp = () => {
           Search
         </button>
       </form>
+
+      {/* Search History */}
       {history.length > 0 && (
-        <div className="mt-4  flex gap-2">
+        <div className="mt-4 flex gap-2">
           {history.map((item, index) => (
             <button
               key={index}
@@ -125,6 +142,8 @@ const WeatherApp = () => {
           ))}
         </div>
       )}
+
+      {/* Loading Indicator */}
       {loading && (
         <motion.p
           className="mt-4 text-lg"
@@ -138,68 +157,20 @@ const WeatherApp = () => {
           />
         </motion.p>
       )}
-      {error && <div>
-          <NotFound/>
+
+      {/* Error Message */}
+      {error && (
+        <div>
+          <NotFound />
           <p className="mt-4 text-red-500">{error}</p>
-        </div>}
-      {weather && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className={` ${weather.main.temp>25?hot:cool}  mt-6 bg-white p-6 rounded-lg shadow-lg text-gray-900 text-center w-full `}
-        >
-          <h2 className="text-3xl font-bold">{weather.name}</h2>
-          <p className="text-xl capitalize">{weather.weather[0].description}</p>
-          <img
-            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
-            alt={weather.weather[0].description}
-            className="mx-auto"
-          />
-
-          <div className="flex flex-col items-center justify-center">
-            <TemperatureDisplay temperature={weather.main.temp} />
-            <div className="flex justify-around w-full mt-4">
-              <p className="text-lg">
-                <img className="w-10" src={humidity} />
-                Humidity: {weather.main.humidity}%
-              </p>
-              <p className="text-lg">
-                <img className="w-10" src={wind} />
-                Wind Speed: {weather.wind.speed} km/h
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => fetchWeather()}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500"
-          >
-            Refresh
-          </button>
-          
-        </motion.div>
-
-      )}
-      {forecast && (
-        
-        <div className="mt-6 bg-gray-200 p-6 flex flex-col item-center justify-center text-black rounded-lg shadow-lg w-full">
-          <h3 className="text-2xl font-bold mb-2">5-Day Forecast</h3>
-          <ForcastChart/>
-          <div className="flex justify-between mb-10">
-            {forecast.map((day, index) => (
-              <div key={index} className={`rounded-sm m-1 space-x-2 text-center`}>
-                <p>{new Date(day.dt_txt).toLocaleDateString()}</p>
-                <img
-                  src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`}
-                  alt={day.weather[0].description}
-                />
-                <p>{day.main.temp}°C</p>
-              </div>
-            ))}
-          </div>
-          <MapLocation weather={weather} />
         </div>
       )}
 
+      {/* Weather Details */}
+      {weather && <WeatherDetails weather={weather} />}
+
+      {/* Forecast Details */}
+      {forecast && <ForcastDetail weather={weather} />}
     </div>
   );
 };
