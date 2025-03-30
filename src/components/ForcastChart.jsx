@@ -41,7 +41,7 @@ const WeatherChart = () => {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, 
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: true },
       title: { display: true, text: "5-Day Temperature Forecast", font: { size: 18 } },
@@ -57,23 +57,27 @@ const WeatherChart = () => {
     <div className="flex flex-col justify-center items-center mt-6 mb-4 w-full">
       <div className="w-full  bg-white shadow-lg rounded-2xl p-6">
         {/* <h2 className="text-xl font-semibold text-gray-700 text-center mb-4">📊 Temperature Forecast</h2> */}
-        <div className="h-[300px] w-full"> 
+        <div className="h-[300px] w-full">
           <Line data={data} options={options} height={400} />
         </div>
       </div>
 
-      <div className="flex justify-between w-full mt-4 bg-gray-400 rounded-sm px-2 mb-10 ">
-            {forecast.map((day, index) => (
-              <div key={index} className={`rounded-sm m-1 text-center`}>
-                <p>{new Date(day.dt_txt).toLocaleDateString()}</p>
-                <img
-                  src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`}
-                  alt={day.weather[0].description}
-                />
-                <p>{day.main.temp}°C</p>
-              </div>
-            ))}
-          </div>
+      <div className="flex justify-between w-full mt-4 bg-gray-400 rounded-sm  mb-10">
+        {forecast.map((day, index) => {
+          const date = new Date(day.dt_txt);
+          const monthDay = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+          return (
+            <div key={index} className="rounded-sm m-1 text-center">
+              <img
+                src={`https://openweathermap.org/img/wn/${day.weather[0].icon}.png`}
+                alt={day.weather[0].description}
+              />
+              <p className="text-sm">{day.main.temp}°C</p>
+              <p className="text-sm">{`${monthDay}`}</p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
